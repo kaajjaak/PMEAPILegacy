@@ -7,8 +7,8 @@ import sqlite3
 import jwt
 from pydantic import BaseModel
 
-SECRET = os.environ["SECRET"]
-cipher_suite = Fernet(str.encode(os.environ['SECRET2']))
+SECRET = "b8e32c1e0a8c6af7b04b1fe193c4293e1c4af76e1456a683"
+cipher_suite = Fernet(b"viGCeC-_tdTJxDb72yWIzFkI4VO5H-fIE9btMX6iTGE=")
 
 
 class Item(BaseModel):
