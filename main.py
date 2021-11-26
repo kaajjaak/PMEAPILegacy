@@ -47,6 +47,7 @@ async def create_account(account: Account, response: Response):
 @app.get("/accounts")
 async def get_item(account: Account):
     account_dict = account.dict()
+    print(account_dict)
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT password FROM accounts WHERE username = ?"
