@@ -16,6 +16,10 @@ class Item(BaseModel):
     password: str
 
 
+class Token(BaseModel):
+    token: str
+
+
 app = FastAPI()
 
 
@@ -49,7 +53,6 @@ async def get_item(item: Item):
     for row in cur.fetchall():
         password = row[0]
         break
-    print(password)
     if cipher_suite.decrypt(password) == str.encode(item_dict["password"]):
         sql = "SELECT token FROM accounts WHERE username = ?"
         cur.execute(sql, [item_dict["username"]])
@@ -58,6 +61,18 @@ async def get_item(item: Item):
             break
         conn.close()
         return token
+
+
+@app.get("/pages/homepage")
+async def get_homepage(token: Token):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "SELECT username FROM accounts WHERE token = ?"
+    cur.execute(sql, [token_dict["token"]])
+    username = cur.fetchone()[0]
+    conn.close()
+    return {"username": username}
 
 
 if __name__ == '__main__':
