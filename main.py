@@ -44,7 +44,7 @@ async def create_account(account: Account, response: Response):
     return account_dict["username"]
 
 
-@app.get("/accounts")
+@app.post("/accounts/login")
 async def get_item(account: Account):
     account_dict = account.dict()
     conn = sqlite3.connect("accounts.db")
