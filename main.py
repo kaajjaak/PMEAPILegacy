@@ -61,7 +61,7 @@ async def get_item(account: Account):
             token = row[0]
             break
         conn.close()
-        return token
+        return {"token": token}
 
 
 @app.get("/pages/homepage")
