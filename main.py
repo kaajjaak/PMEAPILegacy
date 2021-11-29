@@ -15,6 +15,10 @@ class Account(BaseModel):
     username: str
     password: str
 
+class NewAccount(BaseModel):
+    current_password: str
+    new_password: str
+    token: str
 
 class Token(BaseModel):
     token: str
@@ -74,6 +78,17 @@ async def get_homepage(token: Token):
     username = cur.fetchone()[0]
     conn.close()
     return {"username": username}
+
+
+@app.post("/account/changepassword")
+async def change_password(newAccount: NewAccount):
+    account_dict = newAccount.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "UPDATE accounts SET password = ? FROM accounts WHERE token = ? AND password = ?"
+    cur.execute(sql, [account_dict["new_password"], account_dict["token"], account_dict["current_password"]])
+    conn.close()
+    return
 
 
 if __name__ == '__main__':
