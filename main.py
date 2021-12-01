@@ -23,6 +23,14 @@ class NewAccount(BaseModel):
 class Token(BaseModel):
     token: str
 
+class Process(BaseModel):
+    applicationName: str
+    processName: str
+    jwt: str
+
+class Application(BaseModel):
+    applicationName: str
+    jwt: str
 
 app = FastAPI()
 
@@ -88,6 +96,30 @@ async def change_password(newAccount: NewAccount):
     sql = "UPDATE accounts SET password = ? FROM accounts WHERE token = ? AND password = ?"
     cur.execute(sql, [account_dict["new_password"], account_dict["token"], account_dict["current_password"]])
     conn.close()
+    return
+
+
+@app.post("/application/createApplication")
+async def create_application(application: Application):
+    application_dict = application.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "INSERT INTO application(name) VALUES(?)"
+    cur.execute(sql, [application_dict["name"]])
+    sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
+    cur.execute(sql, [application_dict["jwt"], cur.lastrowid])
+    return
+    
+
+@app.post(f"/application/{app_id}/proces/createProcess")
+async def add_process(process: Process):
+    process_dict = process.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "INSERT INTO process(AProcessName) VALUES(?)"
+    cur.execute(sql, [process_dict["processName"]])
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
+    cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
     return
 
 
