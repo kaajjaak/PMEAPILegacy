@@ -137,8 +137,8 @@ async def add_process(process: Process):
 
 
 @app.post(f"/application/{app_id}/process/{process_id}/usage/startusage")
-async def add_process(token: Token):
-  
+async def start_usage(token: Token):
+
 
 if __name__ == '__main__':
     uvicorn.run(app)
