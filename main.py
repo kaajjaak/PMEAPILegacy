@@ -131,7 +131,7 @@ async def add_process(process: Process):
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
-    cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
+    cur.execute(sql, [process_dict["applicationName"]) process_dict["jwt"], cur.lastrowid])
     conn.close()
     return
 
