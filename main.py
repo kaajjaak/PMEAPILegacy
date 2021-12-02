@@ -112,7 +112,7 @@ async def create_application(application: Application):
     return
     
 
-@app.post(f"/application/{app_id}/proces/createProcess")
+@app.post(f"/application/{app_id}/process/createProcess")
 async def add_process(process: Process):
     process_dict = process.dict()
     conn = sqlite3.connect("accounts.db")
@@ -135,6 +135,10 @@ async def add_process(process: Process):
     conn.close()
     return
 
+
+@app.post(f"/application/{app_id}/process/{process_id}/usage/startusage")
+async def add_process(token: Token):
+  
 
 if __name__ == '__main__':
     uvicorn.run(app)
