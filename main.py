@@ -6,6 +6,7 @@ from fastapi import FastAPI, Response, status
 import sqlite3
 import jwt
 from pydantic import BaseModel
+import time
 
 SECRET = "b8e32c1e0a8c6af7b04b1fe193c4293e1c4af76e1456a683"
 cipher_suite = Fernet(b"viGCeC-_tdTJxDb72yWIzFkI4VO5H-fIE9btMX6iTGE=")
@@ -119,25 +120,43 @@ async def add_process(process: Process):
     cur = conn.cursor()
     sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
     cur.execute(sql, [app_id])
-    done = False
+    found = False
     for row in cur.fetchall():
       if row[0] == process_dict["jwt"]:
-        done = True
+        found = True
         break
-    if done is False:
+    if found is False:
       response.status_code = status.HTTP_401_UNAUTHORIZED
       return
-    done = True
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
-    cur.execute(sql, [process_dict["applicationName"]) process_dict["jwt"], cur.lastrowid])
+    cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
     conn.close()
     return
 
 
-@app.post(f"/application/{app_id}/process/{process_id}/usage/startusage")
+@app.post(f"/application/{app_id}/usage/startusage")
 async def start_usage(token: Token):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
+    cur.execute(sql, [app_id])
+    found2 = False
+    for row in cur.fetchall():
+      if token_dict["token"] == row[0]:
+        found2 = True
+        break
+    if found is False:
+      response.status_code = status.HTTP_401_UNAUTHORIZED
+      return
+    sql = "INSERT INTO usage(timeStart) VALUES(?)"
+    cur.execute(sql, [time.time()])
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(?, ?)"
+    cur.execute(sql, [app_id, cur.lastrowid])
+    conn.close()
+    return
 
 
 if __name__ == '__main__':
