@@ -108,6 +108,7 @@ async def create_application(application: Application):
     cur.execute(sql, [application_dict["name"]])
     sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
     cur.execute(sql, [application_dict["jwt"], cur.lastrowid])
+    conn.close()
     return
     
 
@@ -116,10 +117,22 @@ async def add_process(process: Process):
     process_dict = process.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
+    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
+    cur.execute(sql, [app_id])
+    done = False
+    for row in cur.fetchall():
+      if row[0] == process_dict["jwt"]:
+        done = True
+        break
+    if done is False:
+      response.status_code = status.HTTP_401_UNAUTHORIZED
+      return
+    done = True
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
+    conn.close()
     return
 
 
