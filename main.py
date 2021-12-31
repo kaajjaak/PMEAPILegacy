@@ -2,7 +2,7 @@ import os
 
 import uvicorn
 from cryptography.fernet import Fernet
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, HTTPException
 import sqlite3
 import jwt
 from pydantic import BaseModel
@@ -16,22 +16,27 @@ class Account(BaseModel):
     username: str
     password: str
 
+
 class NewAccount(BaseModel):
     current_password: str
     new_password: str
     token: str
 
+
 class Token(BaseModel):
     token: str
+
 
 class Process(BaseModel):
     applicationName: str
     processName: str
     jwt: str
 
+
 class Application(BaseModel):
     applicationName: str
     jwt: str
+
 
 app = FastAPI()
 
@@ -111,10 +116,11 @@ async def create_application(application: Application):
     cur.execute(sql, [application_dict["jwt"], cur.lastrowid])
     conn.close()
     return
-    
 
-@app.post(f"/application/{app_id}/process/createProcess")
-async def add_process(process: Process):
+
+@app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
+async def add_process(app_id: str, process: Process, response: Response):
+    app_id = {"app_id": app_id}
     process_dict = process.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -122,12 +128,12 @@ async def add_process(process: Process):
     cur.execute(sql, [app_id])
     found = False
     for row in cur.fetchall():
-      if row[0] == process_dict["jwt"]:
-        found = True
-        break
+        if row[0] == process_dict["jwt"]:
+            found = True
+            break
     if found is False:
-      response.status_code = status.HTTP_401_UNAUTHORIZED
-      return
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
@@ -136,8 +142,9 @@ async def add_process(process: Process):
     return
 
 
-@app.post(f"/application/{app_id}/usage/startusage")
-async def start_usage(token: Token):
+@app.post("/application/{app_id}/usage/startusage")
+async def start_usage(app_id: str, token: Token, response: Response):
+    app_id = {"app_id": app_id}
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -145,12 +152,12 @@ async def start_usage(token: Token):
     cur.execute(sql, [app_id])
     found2 = False
     for row in cur.fetchall():
-      if token_dict["token"] == row[0]:
-        found2 = True
-        break
-    if found is False:
-      response.status_code = status.HTTP_401_UNAUTHORIZED
-      return
+        if token_dict["token"] == row[0]:
+            found2 = True
+            break
+    if found2 is False:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return
     sql = "INSERT INTO usage(timeStart) VALUES(?)"
     cur.execute(sql, [time.time()])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(?, ?)"
