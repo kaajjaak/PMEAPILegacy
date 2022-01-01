@@ -59,7 +59,7 @@ async def create_account(account: Account, response: Response):
     conn.commit()
     conn.close()
     response.status_code = status.HTTP_201_CREATED
-    return account_dict["username"]
+    return {"username", account_dict["username"]}
 
 
 @app.post("/accounts/login")
