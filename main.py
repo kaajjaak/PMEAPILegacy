@@ -89,7 +89,7 @@ async def get_homepage(token: Token):
     cur = conn.cursor()
     sql = "SELECT username FROM accounts WHERE token = ?"
     cur.execute(sql, [token_dict["token"]])
-    username = cur.fetchone()
+    username = cur.fetchall()[0][0]
     conn.close()
     return {"username": username}
 
