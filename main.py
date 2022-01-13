@@ -79,7 +79,7 @@ async def get_item(account: Account):
             token = row[0]
             break
         conn.close()
-        return {"token": token}
+        return {"token": token, "username": account_dict["username"]}
 
 
 @app.get("/pages/homepage")
@@ -102,7 +102,7 @@ async def change_password(newAccount: NewAccount):
     sql = "UPDATE accounts SET password = ? FROM accounts WHERE token = ? AND password = ?"
     cur.execute(sql, [account_dict["new_password"], account_dict["token"], account_dict["current_password"]])
     conn.close()
-    return
+    return {"status": "success"}
 
 
 @app.post("/application/createApplication")
