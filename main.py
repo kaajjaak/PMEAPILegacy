@@ -82,7 +82,7 @@ async def get_item(account: Account):
         return {"token": token, "username": account_dict["username"]}
 
 
-@app.get("/pages/homepage")
+@app.post("/pages/homepage")
 async def get_homepage(token: Token):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
