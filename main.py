@@ -69,7 +69,9 @@ async def get_item(account: Account):
     cur = conn.cursor()
     sql = "SELECT password FROM accounts WHERE username = ?"
     cur.execute(sql, [account_dict["username"]])
-    password = cur.fetchone()
+    for row in cur.fetchall():
+        password = row[0]
+        break
     print(password)
     if cipher_suite.decrypt(password) == str.encode(account_dict["password"]):
         sql = "SELECT token FROM accounts WHERE username = ?"
@@ -88,7 +90,7 @@ async def get_homepage(token: Token):
     cur = conn.cursor()
     sql = "SELECT username FROM accounts WHERE token = ?"
     cur.execute(sql, [token_dict["token"]])
-    username = cur.fetchone()
+    username = cur.fetchone()[2:-2]
     conn.close()
     return {"username": username}
 
