@@ -102,9 +102,16 @@ async def change_password(newAccount: NewAccount):
     account_dict = newAccount.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
-    sql = "UPDATE accounts SET password = ? WHERE token = ? AND password = ?"
+    sql = "SELECT password FROM accounts where token=?"
+    cur.execute(sql, [account_dict["token"]])
+    for row in cur.fetchall():
+        password = row[0]
+        break
+    if cipher_suite.decrypt(password) != account_dict["current_password"]:
+        return {"status": 'nope'}
+    sql = "UPDATE accounts SET password = ? WHERE token = ?"
     print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
-    cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"], cipher_suite.encrypt(str.encode(account_dict["current_password"]))])
+    cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"]])
     conn.close()
     return {"status": "success"}
 
