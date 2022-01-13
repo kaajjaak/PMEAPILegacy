@@ -107,8 +107,8 @@ async def change_password(newAccount: NewAccount):
     for row in cur.fetchall():
         password = row[0]
         break
-    print(cipher_suite.decrypt(password))
-    if cipher_suite.decrypt(password) != account_dict["current_password"]:
+    print(cipher_suite.decrypt(password).decode("utf-8"))
+    if cipher_suite.decrypt(password).decode("utf-8") != account_dict["current_password"]:
         return {"status": 'nope'}
     sql = "UPDATE accounts SET password = ? WHERE token = ?"
     print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
