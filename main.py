@@ -105,11 +105,12 @@ async def change_password(newAccount: NewAccount):
     cur = conn.cursor()
     sql = "SELECT password FROM accounts where token=?"
     cur.execute(sql, [account_dict["token"]])
+    pass_dict = {}
     for row in cur.fetchall():
-        password = row[0]
+        pass_dict["password"] = row[0]
         break
-    print(password)
-    if cipher_suite.decrypt(password) != account_dict["current_password"]:
+    print(pass_dict["password"])
+    if cipher_suite.decrypt(pass_dict["password"]) != account_dict["current_password"]:
         return {"status": 'nope'}
     sql = "UPDATE accounts SET password = ? WHERE token = ?"
     print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
