@@ -111,6 +111,7 @@ async def change_password(newAccount: NewAccount):
     sql = "UPDATE accounts SET password = ? WHERE token = ?"
     print(account_dict["new_password"])
     print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
+    print(account_dict["token"])
     cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"]])
     conn.close()
     return {"status": "success"}
