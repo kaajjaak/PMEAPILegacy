@@ -100,6 +100,7 @@ async def get_homepage(token: Token):
 @app.post("/accounts/changepassword")
 async def change_password(newAccount: NewAccount):
     account_dict = newAccount.dict()
+    print("token: " + account_dict["token"])
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT password FROM accounts where token=?"
