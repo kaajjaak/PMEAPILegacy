@@ -79,6 +79,7 @@ async def get_item(account: Account):
             token = row[0]
             break
         conn.close()
+        print(token)
         return {"token": token, "username": account_dict["username"]}
 
 
@@ -102,6 +103,7 @@ async def change_password(newAccount: NewAccount):
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "UPDATE accounts SET password = ? FROM accounts WHERE token = ? AND password = ?"
+    print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
     cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"], cipher_suite.encrypt(str.encode(account_dict["current_password"]))])
     conn.close()
     return {"status": "success"}
