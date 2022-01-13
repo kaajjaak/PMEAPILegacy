@@ -108,13 +108,14 @@ async def change_password(newAccount: NewAccount):
         break
     if cipher_suite.decrypt(password).decode("utf-8") != account_dict["current_password"]:
         return {"status": 'nope'}
-    sql = "UPDATE accounts SET password = ? WHERE token = ?"
-    print(account_dict["new_password"])
-    print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
-    print(account_dict["token"])
-    cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"]])
-    conn.close()
-    return {"status": "success"}
+    else:
+        sql = "UPDATE accounts SET password = ? WHERE token = ?"
+        print(account_dict["new_password"])
+        print(cipher_suite.encrypt(str.encode(account_dict["new_password"])))
+        print(account_dict["token"])
+        cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"]])
+        conn.close()
+        return {"status": "success"}
 
 
 @app.post("/application/createApplication")
