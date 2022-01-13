@@ -99,7 +99,6 @@ async def get_homepage(token: Token):
 @app.post("/accounts/changepassword")
 async def change_password(newAccount: NewAccount):
     account_dict = newAccount.dict()
-    print(account_dict["current_password"])
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT password FROM accounts where token=?"
@@ -107,7 +106,6 @@ async def change_password(newAccount: NewAccount):
     for row in cur.fetchall():
         password = row[0]
         break
-    print(cipher_suite.decrypt(password).decode("utf-8"))
     if cipher_suite.decrypt(password).decode("utf-8") != account_dict["current_password"]:
         return {"status": 'nope'}
     sql = "UPDATE accounts SET password = ? WHERE token = ?"
