@@ -69,6 +69,7 @@ async def get_item(account: Account):
     cur = conn.cursor()
     sql = "SELECT password FROM accounts WHERE username = ?"
     cur.execute(sql, [account_dict["username"]])
+    password = ""
     for row in cur.fetchall():
         password = row[0]
         break
