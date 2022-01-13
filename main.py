@@ -97,7 +97,7 @@ async def get_homepage(token: Token):
     return {"username": username}
 
 
-@app.post("/account/changepassword")
+@app.post("/accounts/changepassword")
 async def change_password(newAccount: NewAccount):
     account_dict = newAccount.dict()
     conn = sqlite3.connect("accounts.db")
