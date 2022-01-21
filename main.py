@@ -63,7 +63,7 @@ async def create_account(account: Account, response: Response):
 
 
 @app.post("/accounts/login")
-async def get_item(account: Account):
+async def get_item(account: Account, response: Response):
     account_dict = account.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -72,14 +72,21 @@ async def get_item(account: Account):
     for row in cur.fetchall():
         password = row[0]
         break
-    if cipher_suite.decrypt(password) == str.encode(account_dict["password"]):
-        sql = "SELECT token FROM accounts WHERE username = ?"
-        cur.execute(sql, [account_dict["username"]])
-        for row in cur.fetchall():
-            token = row[0]
-            break
+    try:
+      if cipher_suite.decrypt(password) == str.encode(account_dict["password"]):
+          sql = "SELECT token FROM accounts WHERE username = ?"
+          cur.execute(sql, [account_dict["username"]])
+          for row in cur.fetchall():
+              token = row[0]
+              break
+          conn.close()
+          response.status_code = status.HTTP_202_ACCEPTED
+          return {"token": token, "username": account_dict["username"]}
+      except UnboundLocalError:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         conn.close()
-        return {"token": token, "username": account_dict["username"]}
+        return
+        
 
 
 @app.post("/pages/homepage")
