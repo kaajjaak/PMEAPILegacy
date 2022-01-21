@@ -82,10 +82,10 @@ async def get_item(account: Account, response: Response):
           conn.close()
           response.status_code = status.HTTP_202_ACCEPTED
           return {"token": token, "username": account_dict["username"]}
-      except UnboundLocalError:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        conn.close()
-        return
+    except UnboundLocalError:
+      response.status_code = status.HTTP_401_UNAUTHORIZED
+      conn.close()
+      return
         
 
 
