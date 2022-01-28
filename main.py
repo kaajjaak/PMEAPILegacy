@@ -141,6 +141,13 @@ async def create_application(application: Application, response: Response):
     return {"id": rowidvalue}
 
 
+@app.get("/application/applicationList")
+async def list_applications(token: Token):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sl = "SELECT * FROM application WHERE"
+
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
 async def add_process(app_id: str, process: Process, response: Response):
     app_id = {"app_id": app_id}
