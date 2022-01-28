@@ -127,7 +127,7 @@ async def change_password(newAccount: NewAccount):
 
 
 @app.post("/application/createApplication")
-async def create_application(application: Application):
+async def create_application(application: Application, response: Response):
     application_dict = application.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -136,6 +136,7 @@ async def create_application(application: Application):
     sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
     rowidvalue = cur.lastrowid
     cur.execute(sql, [application_dict["jwt"], rowidvalue])
+    response.status_code = status.HTTP_201_CREATED
     conn.close()
     return {"id": rowidvalue}
 
