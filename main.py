@@ -134,9 +134,10 @@ async def create_application(application: Application):
     sql = "INSERT INTO application(name) VALUES(?)"
     cur.execute(sql, [application_dict["name"]])
     sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
-    cur.execute(sql, [application_dict["jwt"], cur.lastrowid])
+    rowidvalue = cur.lastrowid
+    cur.execute(sql, [application_dict["jwt"], rowidvalue])
     conn.close()
-    return
+    return {"id": rowidvalue}
 
 
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
