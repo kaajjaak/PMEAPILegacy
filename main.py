@@ -132,7 +132,7 @@ async def create_application(application: Application):
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "INSERT INTO application(name) VALUES(?)"
-    cur.execute(sql, [application_dict["name"]])
+    cur.execute(sql, [application_dict["applicationName"]])
     sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
     rowidvalue = cur.lastrowid
     cur.execute(sql, [application_dict["jwt"], rowidvalue])
