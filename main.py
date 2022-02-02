@@ -146,11 +146,11 @@ async def list_applications(token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
-    sql = "SELECT * FROM application WHERE applicationID in (SELECT * FROM AccountApplicationConnection WHERE IDAccount in (SELECT id FROM accounts WHERE token = ?))"
-    cur.execute(sql, [token_dict["token"]])
+    sql = "SELECT applicationID, name FROM application WHERE applicationID in (SELECT * FROM AccountApplicationConnection WHERE IDAccount in (SELECT id FROM accounts WHERE token = ?))"
+    applications = cur.execute(sql, [token_dict["token"]]).fetchall()
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
-    return cur.fetchall()
+    return applications
 
 
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
