@@ -146,7 +146,11 @@ async def list_applications(token: Token):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
-    sl = "SELECT * FROM application WHERE"
+    sql = "SELECT * FROM application WHERE applicationID in (SELECT * FROM AccountApplicationConnection WHERE IDAccount in (SELECT id FROM accounts WHERE token = ?))"
+    applications = cur.execute(sql, [token_dict["token"]]).fetchall()
+    conn.close()
+    return applications
+
 
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
 async def add_process(app_id: str, process: Process, response: Response):
