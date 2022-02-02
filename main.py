@@ -146,7 +146,7 @@ async def list_applications(token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
-    sql = "SELECT applicationID, name FROM application WHERE applicationID in (SELECT * FROM AccountApplicationConnection WHERE IDAccount in (SELECT id FROM accounts WHERE token = ?))"
+    sql = "SELECT applicationID, name FROM application app WHERE (app.applicationID IN (SELECT * FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id idd FROM accounts WHERE idd.token = ?)))"
     cur.execute(sql, (token_dict["token"],))
     applications = cur.fetchall()
     response.status_code = status.HTTP_202_ACCEPTED
