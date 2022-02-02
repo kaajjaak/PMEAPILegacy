@@ -141,13 +141,14 @@ async def create_application(application: Application, response: Response):
     return {"id": rowidvalue}
 
 
-@app.get("/application/applicationList")
-async def list_applications(token: Token):
+@app.post("/application/applicationList")
+async def list_applications(token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT * FROM application WHERE applicationID in (SELECT * FROM AccountApplicationConnection WHERE IDAccount in (SELECT id FROM accounts WHERE token = ?))"
     applications = cur.execute(sql, [token_dict["token"]]).fetchall()
+    response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return applications
 
