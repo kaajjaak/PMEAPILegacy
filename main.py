@@ -156,6 +156,7 @@ async def list_applications(token: Token, response: Response):
         applications_json += {"name": application[0], "ID": application[1]}
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
+    print(json.dumps(applications_json))
     return json.dumps(applications_json)
 
 
