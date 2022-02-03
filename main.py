@@ -151,14 +151,11 @@ async def list_applications(token: Token, response: Response):
     sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = ?)))"
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
-    print(applications)
     applications_json = []
     for application in applications:
-        print(f"applicaiton: {application}")
-        applications_json += {"name": application[0], "ID": application[1]}
+        applications_json.append({"name": application[0], "ID": application[1]})
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
-    print(json.dumps(applications_json))
     return json.dumps(applications_json)
 
 
