@@ -150,9 +150,12 @@ async def list_applications(token: Token, response: Response):
     sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = ?)))"
     cur.execute(sql, (token_dict["token"],))
     applications = cur.fetchall()
+    applicaitons_json = {}
+    for application in applications:
+        applicaitons_json += {{"name": application[0]}, {"ID", application[1]}}
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
-    return applications
+    return applicaitons_json
 
 
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
