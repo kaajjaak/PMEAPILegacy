@@ -154,6 +154,7 @@ async def list_applications(token: Token, response: Response):
     print(applications)
     applications_json = []
     for application in applications:
+        print(f"applicaiton: {application}")
         applications_json += {"name": application[0], "ID": application[1]}
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
