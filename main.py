@@ -153,7 +153,7 @@ async def list_applications(token: Token, response: Response):
     applications = cur.fetchall()
     applications_json = []
     for application in applications:
-        applications_json.append({"name": application[0], "id": application[1]})
+        applications_json.append({"name": application[0], "id": str(application[1])})
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return json.dumps({"data": applications_json})
