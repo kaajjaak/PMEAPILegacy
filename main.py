@@ -152,7 +152,7 @@ async def list_applications(token: Token, response: Response):
     applications = cur.fetchall()
     applications_json = {}
     for application in applications:
-        applications_json += {{"name": application[0]}, {"ID", application[1]}}
+        applications_json += {"name": application[0], "ID": application[1]}
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return applications_json
