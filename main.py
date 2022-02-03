@@ -136,6 +136,7 @@ async def create_application(application: Application, response: Response):
     sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
     rowidvalue = cur.lastrowid
     cur.execute(sql, [application_dict["jwt"], rowidvalue])
+    conn.commit()
     response.status_code = status.HTTP_201_CREATED
     conn.close()
     return {"id": rowidvalue}
