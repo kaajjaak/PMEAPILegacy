@@ -149,8 +149,9 @@ async def list_applications(token: Token, response: Response):
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = ?)))"
-    cur.execute(sql, (token_dict["token"],))
+    cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
+    print(applications)
     applications_json = []
     for application in applications:
         applications_json += {"name": application[0], "ID": application[1]}
