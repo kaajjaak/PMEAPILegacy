@@ -156,7 +156,7 @@ async def list_applications(token: Token, response: Response):
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
-    return json.dumps(applications_json)
+    return application_json
 
 
 @app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
