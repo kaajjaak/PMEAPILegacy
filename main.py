@@ -184,9 +184,24 @@ async def add_process(app_id: int, process: Process, response: Response):
     return
 
 
+@app.post("/application/{app_id}/processList")
+async def list_process(app_id: int, token: Token, response: Response):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "SELECT IDProcess, AProcessName FROM process WHERE IDProcess IN (SELECT ProcessID FROM ApplicationProcessConnection WHERE ApplicationID IN (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount = (SELECT id FROM accounts WHERE token = ?)))"
+    cur.execute(sql, [token_dict["token"]])
+    processes = cur.fetchall()
+    processes_json = []
+    for process in processes:
+        processes_json.append({"process": {"id": process[0], "name": process[1]}})
+    response.status_code = status.HTTP_202_ACCEPTED
+    conn.close()
+    return processes_json
+
+
 @app.post("/application/{app_id}/usage/startusage")
-async def start_usage(app_id: str, token: Token, response: Response):
-    app_id = {"app_id": app_id}
+async def start_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
