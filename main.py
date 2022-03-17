@@ -219,6 +219,19 @@ async def start_usage(app_id: int, token: Token, response: Response):
     cur.execute(sql, [time.time()])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(?, ?)"
     cur.execute(sql, [app_id, cur.lastrowid])
+    conn.commit()
+    conn.close()
+    return
+
+
+@app.post("/application/{app_id}/usage/endusage")
+async def start_usage(app_id: int, token: Token, response: Response):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = "UPDATE usage SET timeEnd = ? WHERE (IDUsage in (SELECT UsageID FROM ApplicationUsageConnection WHERE ApplicationID in (SELECT IDApplication FROM AccountApplicationConnection  WHERE IDAccount IN (SELECT id FROM accounts WHERE token = ?)) AND ApplicationID = ?))"
+    cur.execute(sql, [time.time(), token_dict["token"], app_id])
+    conn.commit()
     conn.close()
     return
 
