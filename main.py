@@ -161,7 +161,6 @@ async def list_applications(token: Token, response: Response):
 
 @app.post("/application/{app_id}/process/createProcess")
 async def add_process(app_id: int, process: Process, response: Response):
-    print(app_id)
     process_dict = process.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -181,6 +180,7 @@ async def add_process(app_id: int, process: Process, response: Response):
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
     conn.commit()
     conn.close()
+    response.status_code = status.HTTP_201_CREATED
     return
 
 
