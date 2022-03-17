@@ -189,8 +189,8 @@ async def list_process(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
-    sql = "SELECT IDProcess, AProcessName FROM process WHERE IDProcess IN (SELECT ProcessID FROM ApplicationProcessConnection WHERE ApplicationID IN (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount = (SELECT id FROM accounts WHERE token = ?)))"
-    cur.execute(sql, [token_dict["token"]])
+    sql = "SELECT IDProcess, AProcessName FROM process WHERE IDProcess IN (SELECT ProcessID FROM ApplicationProcessConnection WHERE ApplicationID IN (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount = (SELECT id FROM accounts WHERE token = ?)) AND ApplicationID = ?)"
+    cur.execute(sql, [token_dict["token"], app_id])
     processes = cur.fetchall()
     processes_json = []
     for process in processes:
