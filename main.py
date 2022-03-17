@@ -159,7 +159,7 @@ async def list_applications(token: Token, response: Response):
     return applications_json
 
 
-@app.post("/application/{app_id}/process/createProcess", status_code=status.HTTP_201_CREATED)
+@app.post("/application/{app_id}/process/createProcess")
 async def add_process(app_id: str, process: Process, response: Response):
     app_id = {"app_id": app_id}
     process_dict = process.dict()
@@ -177,8 +177,9 @@ async def add_process(app_id: str, process: Process, response: Response):
         return
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
-    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND and applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT IDApplication FROM application WHERE name=? AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
+    conn.commit()
     conn.close()
     return
 
