@@ -161,13 +161,12 @@ async def list_applications(token: Token, response: Response):
 
 @app.post("/application/{app_id}/process/createProcess")
 async def add_process(app_id: int, process: Process, response: Response):
-    appl_id = {"app_id": app_id}
-    print(appl_id)
+    print(app_id)
     process_dict = process.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
     sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
-    cur.execute(sql, [appl_id])
+    cur.execute(sql, [app_id])
     found = False
     for row in cur.fetchall():
         if row[0] == process_dict["jwt"]:
