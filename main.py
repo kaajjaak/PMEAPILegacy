@@ -194,7 +194,7 @@ async def list_process(app_id: int, token: Token, response: Response):
     processes = cur.fetchall()
     processes_json = []
     for process in processes:
-        processes_json.append({"process": {"id": process[0], "name": process[1]}})
+        processes_json.append({"process": {"id": process[0], "name": process[1]}, "id": app_id})
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return processes_json
