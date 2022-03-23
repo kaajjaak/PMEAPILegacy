@@ -200,7 +200,7 @@ async def list_process(app_id: int, token: Token, response: Response):
     return processes_json
 
 
-@app.post("/application/{app_id}/usage/startusage")
+@app.post("/application/{app_id}/usage/startUsage")
 async def start_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
@@ -224,8 +224,8 @@ async def start_usage(app_id: int, token: Token, response: Response):
     return
 
 
-@app.post("/application/{app_id}/usage/endusage")
-async def start_usage(app_id: int, token: Token, response: Response):
+@app.post("/application/{app_id}/usage/endUsage")
+async def end_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = sqlite3.connect("accounts.db")
     cur = conn.cursor()
@@ -234,6 +234,14 @@ async def start_usage(app_id: int, token: Token, response: Response):
     conn.commit()
     conn.close()
     return
+
+
+@app.post("/application/{app_id}/limits/createlimit")
+async def create_limit(app_id: int, token: Token, response: Response):
+    token_dict = token.dict()
+    conn = sqlite3.connect("accounts.db")
+    cur = conn.cursor()
+    sql = ""
 
 
 if __name__ == '__main__':
