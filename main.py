@@ -40,6 +40,12 @@ class Application(BaseModel):
     jwt: str
 
 
+class Limit(BaseModel):
+    token: str
+    applicationID: int
+    limit: int
+
+
 app = FastAPI()
 
 
@@ -244,11 +250,24 @@ async def end_usage(app_id: int, token: Token, response: Response):
 
 
 @app.post("/application/{app_id}/limits/createlimit")
-async def create_limit(app_id: int, token: Token, response: Response):
-    token_dict = token.dict()
+async def create_limit(app_id: int, limit: Limit, response: Response):
     conn = start_connection()
     cur = conn.cursor()
-    sql = ""
+    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = %s)"
+    cur.execute(sql, [app_id])
+    found2 = False
+    for row in cur.fetchall():
+        if limit.token == row[0]:
+            found2 = True
+            break
+    if found2 is False:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return
+    sql = "INSERT INTO limit(LimitApplicationID, limitTime) VALUES(%s, %s)"
+    cur.execute(sql, [limit.applicationID, limit.limit])
+    conn.commit()
+    conn.close()
+    return
 
 
 if __name__ == '__main__':
