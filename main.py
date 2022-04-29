@@ -44,10 +44,10 @@ app = FastAPI()
 
 
 def start_connection():
-    return mysql.connector.connect(user='ba5c5113ca0f82',
-                                   password='cb791bc2',
-                                   host='eu-cdbr-west-02.cleardb.net',
-                                   database='heroku_41e9b5851974600')
+    return mysql.connector.connect(user='ID191774_6itngip3',
+                                   password='BhJNVQ2i',
+                                   host='ID191774_6itngip3.db.webhosting.be',
+                                   database='ID191774_6itngip3')
 
 
 @app.get("/")
@@ -60,7 +60,7 @@ async def create_account(account: Account, response: Response):
     account_dict = account.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "INSERT INTO accounts(username, password, token) VALUES(?, ?, ?)"
+    sql = "INSERT INTO accounts(username, password, token) VALUES(%s, %s, %s)"
     encoded_jwt = jwt.encode({"username": account_dict["username"], "password": account_dict["password"]}, SECRET,
                              algorithm="HS256")
     params = [account_dict["username"], cipher_suite.encrypt(str.encode(account_dict["password"])), encoded_jwt]
@@ -76,14 +76,14 @@ async def get_item(account: Account, response: Response):
     account_dict = account.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT password FROM accounts WHERE username = ?"
+    sql = "SELECT password FROM accounts WHERE username = %s"
     cur.execute(sql, [account_dict["username"]])
     for row in cur.fetchall():
         password = row[0]
         break
     try:
         if cipher_suite.decrypt(password) == str.encode(account_dict["password"]):
-            sql = "SELECT token FROM accounts WHERE username = ?"
+            sql = "SELECT token FROM accounts WHERE username = %s"
             cur.execute(sql, [account_dict["username"]])
             for row in cur.fetchall():
                 token = row[0]
@@ -106,7 +106,7 @@ async def get_homepage(token: Token):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT username FROM accounts WHERE token = ?"
+    sql = "SELECT username FROM accounts WHERE token = %s"
     cur.execute(sql, [token_dict["token"]])
     for row in cur.fetchall():
         username = row[0]
@@ -120,14 +120,14 @@ async def change_password(newAccount: NewAccount):
     account_dict = newAccount.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT password FROM accounts where token=?"
+    sql = "SELECT password FROM accounts where token=%s"
     cur.execute(sql, [account_dict["token"]])
     for row in cur.fetchall():
         password = row[0]
         break
     if cipher_suite.decrypt(password).decode("utf-8") != account_dict["current_password"]:
         return {"status": 'nope'}
-    sql = "UPDATE accounts SET password = ? WHERE token = ?"
+    sql = "UPDATE accounts SET password = ? WHERE token = %s"
     cur.execute(sql, [cipher_suite.encrypt(str.encode(account_dict["new_password"])), account_dict["token"]])
     conn.commit()
     conn.close()
@@ -139,9 +139,9 @@ async def create_application(application: Application, response: Response):
     application_dict = application.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "INSERT INTO application(name) VALUES(?)"
+    sql = "INSERT INTO application(name) VALUES(%s)"
     cur.execute(sql, [application_dict["applicationName"]])
-    sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=?), ?)"
+    sql = "INSERT INTO AccountApplicationConnection(IDAccount, IDApplication) VALUES((SELECT id FROM accounts WHERE token=%s), %s)"
     rowidvalue = cur.lastrowid
     cur.execute(sql, [application_dict["jwt"], rowidvalue])
     conn.commit()
@@ -155,7 +155,7 @@ async def list_applications(token: Token, response: Response):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = ?)))"
+    sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = %s)))"
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
     applications_json = []
@@ -171,7 +171,7 @@ async def add_process(app_id: int, process: Process, response: Response):
     process_dict = process.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
+    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = %s)"
     cur.execute(sql, [app_id])
     found = False
     for row in cur.fetchall():
@@ -183,7 +183,7 @@ async def add_process(app_id: int, process: Process, response: Response):
         return
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
-    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT applicationID FROM application WHERE name=? AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=?))), ?)"
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT applicationID FROM application WHERE name=? AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=%s))), %s)"
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
     conn.commit()
     conn.close()
@@ -196,7 +196,7 @@ async def list_process(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT IDProcess, AProcessName FROM process WHERE IDProcess IN (SELECT ProcessID FROM ApplicationProcessConnection WHERE ApplicationID IN (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount = (SELECT id FROM accounts WHERE token = ?)) AND ApplicationID = ?)"
+    sql = "SELECT IDProcess, AProcessName FROM process WHERE IDProcess IN (SELECT ProcessID FROM ApplicationProcessConnection WHERE ApplicationID IN (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount = (SELECT id FROM accounts WHERE token = %s)) AND ApplicationID = %s)"
     cur.execute(sql, [token_dict["token"], app_id])
     processes = cur.fetchall()
     processes_json = []
@@ -212,7 +212,7 @@ async def start_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = ?)"
+    sql = "SELECT token FROM accounts WHERE id IN (SELECT IDAccount FROM AccountApplicationConnection WHERE IDApplication = %s)"
     cur.execute(sql, [app_id])
     found2 = False
     for row in cur.fetchall():
@@ -224,7 +224,7 @@ async def start_usage(app_id: int, token: Token, response: Response):
         return
     sql = "INSERT INTO usage(timeStart) VALUES(?)"
     cur.execute(sql, [time.time()])
-    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(?, ?)"
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(%s, %s)"
     cur.execute(sql, [app_id, cur.lastrowid])
     conn.commit()
     conn.close()
@@ -236,7 +236,7 @@ async def end_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "UPDATE usage SET timeEnd = ? WHERE (IDUsage in (SELECT UsageID FROM ApplicationUsageConnection WHERE ApplicationID in (SELECT IDApplication FROM AccountApplicationConnection  WHERE IDAccount IN (SELECT id FROM accounts WHERE token = ?)) AND ApplicationID = ?))"
+    sql = "UPDATE usage SET timeEnd = %s WHERE (IDUsage in (SELECT UsageID FROM ApplicationUsageConnection WHERE ApplicationID in (SELECT IDApplication FROM AccountApplicationConnection  WHERE IDAccount IN (SELECT id FROM accounts WHERE token = %s)) AND ApplicationID = %s))"
     cur.execute(sql, [time.time(), token_dict["token"], app_id])
     conn.commit()
     conn.close()
