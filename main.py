@@ -228,8 +228,8 @@ async def start_usage(app_id: int, token: Token, response: Response):
     if found2 is False:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return
-    sql = "INSERT INTO usage(timeStart) VALUES(%s)"
-    cur.execute(sql, [time.time()])
+    sql = "INSERT INTO usage(timeStart) VALUES(UNIX_TIMESTAMP(now()))"
+    cur.execute(sql, )
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(%s, %s)"
     cur.execute(sql, [app_id, cur.lastrowid])
     conn.commit()
