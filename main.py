@@ -88,6 +88,7 @@ async def get_item(account: Account, response: Response):
         password = row[0]
         break
     try:
+        print(cipher_suite.decrypt(bytes(password, 'utf-8')))
         if cipher_suite.decrypt(bytes(password, 'utf-8')) == str.encode(account_dict["password"]):
             sql = "SELECT token FROM accounts WHERE username = %s"
             cur.execute(sql, [account_dict["username"]])
