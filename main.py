@@ -164,6 +164,7 @@ async def list_applications(token: Token, response: Response):
     sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = %s)))"
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
+    print(applications)
     applications_json = []
     for application in applications:
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
