@@ -88,7 +88,6 @@ async def get_item(account: Account, response: Response):
         password = row[0]
         break
     try:
-        print(cipher_suite.decrypt(bytes(password, 'utf-8')))
         if cipher_suite.decrypt(bytes(password, 'utf-8')) == str.encode(account_dict["password"]):
             sql = "SELECT token FROM accounts WHERE username = %s"
             cur.execute(sql, [account_dict["username"]])
@@ -168,6 +167,7 @@ async def list_applications(token: Token, response: Response):
     applications_json = []
     for application in applications:
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
+    print(applications_json)
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return applications_json
