@@ -165,6 +165,7 @@ async def list_applications(token: Token, response: Response):
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
     applications_json = []
+    print(applications_json)
     for application in applications:
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
     response.status_code = status.HTTP_202_ACCEPTED
@@ -228,7 +229,7 @@ async def start_usage(app_id: int, token: Token, response: Response):
     if found2 is False:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return
-    sql = "INSERT INTO usage(timeStart) VALUES(?)"
+    sql = "INSERT INTO usage(timeStart) VALUES(%s)"
     cur.execute(sql, [time.time()])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES(%s, %s)"
     cur.execute(sql, [app_id, cur.lastrowid])
