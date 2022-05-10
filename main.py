@@ -164,11 +164,9 @@ async def list_applications(token: Token, response: Response):
     sql = "SELECT name, applicationID FROM application app WHERE (app.applicationID IN (SELECT ApplicationID FROM AccountApplicationConnection appc WHERE appc.IDAccount in (SELECT id FROM accounts idd WHERE idd.token = %s)))"
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
-    print(applications)
     applications_json = []
     for application in applications:
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
-    print(applications_json)
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return applications_json
@@ -191,7 +189,7 @@ async def add_process(app_id: int, process: Process, response: Response):
         return
     sql = "INSERT INTO process(AProcessName) VALUES(?)"
     cur.execute(sql, [process_dict["processName"]])
-    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT applicationID FROM application WHERE name=? AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=%s))), %s)"
+    sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT applicationID FROM application WHERE name=%s AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=%s))), %s)"
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
     conn.commit()
     conn.close()
