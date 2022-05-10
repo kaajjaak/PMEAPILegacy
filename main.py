@@ -165,9 +165,9 @@ async def list_applications(token: Token, response: Response):
     cur.execute(sql, [token_dict["token"]])
     applications = cur.fetchall()
     applications_json = []
-    print(applications_json)
     for application in applications:
         applications_json.append({"application": {"name": application[0], "id": application[1]}})
+    print(applications_json)
     response.status_code = status.HTTP_202_ACCEPTED
     conn.close()
     return applications_json
