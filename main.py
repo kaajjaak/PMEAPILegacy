@@ -187,7 +187,7 @@ async def add_process(app_id: int, process: Process, response: Response):
     if found is False:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return
-    sql = "INSERT INTO process(AProcessName) VALUES(?)"
+    sql = "INSERT INTO process(AProcessName) VALUES(%s)"
     cur.execute(sql, [process_dict["processName"]])
     sql = "INSERT INTO ApplicationProcessConnection(ApplicationID, ProcessID) VALUES ((SELECT applicationID FROM application WHERE name=%s AND applicationID in (SELECT IDApplication FROM AccountApplicationConnection WHERE IDAccount=(SELECT id FROM accounts WHERE token=%s))), %s)"
     cur.execute(sql, [process_dict["applicationName"], process_dict["jwt"], cur.lastrowid])
