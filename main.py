@@ -242,8 +242,8 @@ async def end_usage(app_id: int, token: Token, response: Response):
     token_dict = token.dict()
     conn = start_connection()
     cur = conn.cursor()
-    sql = "UPDATE usage SET timeEnd = %s WHERE (IDUsage in (SELECT UsageID FROM ApplicationUsageConnection WHERE ApplicationID in (SELECT IDApplication FROM AccountApplicationConnection  WHERE IDAccount IN (SELECT id FROM accounts WHERE token = %s)) AND ApplicationID = %s))"
-    cur.execute(sql, [time.time(), token_dict["token"], app_id])
+    sql = "UPDATE usage SET timeEnd = UNIX_TIMESTAMP(NOW()) WHERE (IDUsage in (SELECT UsageID FROM ApplicationUsageConnection WHERE ApplicationID in (SELECT IDApplication FROM AccountApplicationConnection  WHERE IDAccount IN (SELECT id FROM accounts WHERE token = %s)) AND ApplicationID = %s))"
+    cur.execute(sql, token_dict["token", app_id])
     conn.commit()
     conn.close()
     return
