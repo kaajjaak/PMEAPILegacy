@@ -34,6 +34,7 @@ There are a couple big issues with this API which I will list here.
 	- In my defense, my unorthodox way of implementing password encryption instead of hashing means that a hacker would never be able to use a rainbow table to decrypt the entire database, though a proper implementation of salting solves the same issue and better.
 3. All secrets and passwords are not saved in a `.env` file and instead just in the `main.py` file. This was somewhat fine during production since it was a private repo only for myself but it is generally still recommended to store secret information in a different file which would then be added to `.gitignore` just in case. If not for security reasons, this is also better if you want to expand the project to multiple files.
 4. There are some more small issues such as imports from previous versions which are now unused and the test file being commited and therefore also pushed to heroku iirc but I think I have listed enough.
+5. It uses post requests for everything since it didn't want to work in C# otherwise. I'm not entirely sure how big of a deal this is.
 
 I was originally considering reusing this API for the complete rewrite in a way where I would address all these issues but after some thinking, I decided not to do that and just writing a new API in a more commonly used API framework.
 
