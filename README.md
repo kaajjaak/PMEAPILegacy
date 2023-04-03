@@ -43,6 +43,7 @@ I was originally considering reusing this API for the complete rewrite in a way 
 
 - [Legacy Desktop Version](https://github.com/kaajjaak/PMEDesktopLegacy)
 - [Legacy Mobile Version](https://github.com/kaajjaak/PMEMobileLegacy)
+- [Legacy Android Version (unfinished)](https://github.com/kaajjaak/PMEAndroidLegacy)
 
 
 
